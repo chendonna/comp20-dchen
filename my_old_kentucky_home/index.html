@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>My Old Kentucky Home</title>
+		<link rel="stylesheet" href="style.css" type="text/css" />
+	</head>
+
+	<body>
+
+		<h1 id="title">My Old Kentucky Home</h1>
+
+		<video src="https://www.cs.tufts.edu/comp/20/my_old_kentucky_home.mp4" id="music_video" controls></video>
+		<button onclick = "video.play()">play</button>
+		<button onclick = "video.pause()">pause</button>
+		<div id="lyrics"></div>
+
+		<script>
+	// Complete this section and create a CSS file named style.css
+		var video = document.getElementById("music_video");
+		var lyrics = document.getElementById("lyrics");
+
+		video.addEventListener("timeupdate", function () {
+			if (video.currentTime < 8) {
+				lyrics.innerHTML = "<h3>Interlude...</h3>"
+			} else if (video.currentTime >= 8 && video.currentTime < 16) {
+				lyrics.innerHTML = "<h3>The sun shines bright in my Old Kentuck Home</h3>e"
+			} else if (video.currentTime >= 16 && video.currentTime < 22) {
+				lyrics.innerHTML = "<h3>'Tis summer, the people are gay;'</h3>"
+			} else if (video.currentTime >= 22 && video.currentTime < 29) {
+				lyrics.innerHTML = "<h3>The corn-top's ripe and the meadow's in the bloom</h3>"
+			} else if (video.currentTime >= 29 && video.currentTime < 36) {
+				lyrics.innerHTML = "<h3>While the birds make music all the day</h3>"
+			}
+		}, false);
+		</script>
+	</body>
+</html>	
