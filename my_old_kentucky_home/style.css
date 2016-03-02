@@ -1,5 +1,6 @@
 body {
 	text-align: center;
+	color: #668B8B;
 }
 #lyrics {
 	margin-left: 27%;
@@ -7,5 +8,5 @@ body {
 	margin-top: 10px;
 }
 .image {
-	width: 25%;
+	width: 30%;
 }
