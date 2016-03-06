@@ -1,1 +1,17 @@
 /* Your CSS here... */
+body {
+	text-align: center;
+	color: #53868B
+}
+p {
+	border: solid;
+	border-radius: 3px;
+	border-width: 1px;
+	border-color: #008B8B;
+	margin-right: 10%;
+	margin-left: 10%;
+	padding: 5px;
+}
+.usn {
+	font-weight: bold;
+}
