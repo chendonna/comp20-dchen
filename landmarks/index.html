@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<title>Historical Landmarks</title>
+		<meta charset = "utf-8">
+		<meta name = "viewport" content = "initial-scale=1.0, user-scalable=no" />
+		<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=true"></script>
+		<link rel = "stylesheet" href = "style.css" type = "text/css"/>
+		<script>
+			var map; 
+			var myLat = 0;
+			var myLong = 0;
+			var request = new XMLHttpRequest;
+			var myLocation = new google.maps.LatLng(myLat, myLong);
+			var myOptions = {
+				zoom: 13,
+				center: myLocation,
+			};
+			var marker;
+			function initialize() {
+				map = new google.maps.Map(document.getElementById("map"), myOptions);
+				getMyLocation();
+			}
+			function getMyLocation() {
+
+				if (navigator.geolocation){
+					navigator.geolocation.getCurrentPosition(function (position){
+						myLat = position.coords.latitude;
+						myLong = position.coords.longitude;
+						renderMap();
+					});
+				} else {
+					alert("geolocation not supported on your browser");
+				}
+			}
+			function renderMap() {
+				myLocation = new google.maps.LatLng(myLat, myLong);
+				map.panTo(myLocation);
+				marker = new google.maps.Marker({
+					position: myLocation,
+				});
+				marker.setMap(map);
+			}
+		</script>
+	</head>
+	<body onload = "initialize()">
+		<div id = "map"></div>
+	</body>
+</html>
