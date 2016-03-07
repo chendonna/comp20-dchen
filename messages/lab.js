@@ -7,7 +7,6 @@ function parse() {
 		if (request.readyState == 4) {
 			result = " ";
 			requestData = JSON.parse(request.responseText);
-			console.log(requestData);
 			elem = document.getElementById("messages");
 			for (var i = 0; i < requestData.length; i++) {
 				result = result + "<p><span class = 'usn'>" + requestData[i]["username"] + ":</span> "+requestData[i]["content"]+"</p>";
