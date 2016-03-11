@@ -4,7 +4,7 @@ function parse() {
 	request.open("GET", "data.json", true);
 	//request.open("GET", "https://messagehub.herokuapp.com/messages.json", true)
 	request.onreadystatechange = function() {
-		if (request.readyState == 4) {
+		if (request.readyState == 4 && request.readyStatus == 200) {
 			result = " ";
 			requestData = JSON.parse(request.responseText);
 			elem = document.getElementById("messages");
