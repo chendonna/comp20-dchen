@@ -8,7 +8,7 @@
 		<title>Historical Landmarks</title>
 		<meta charset = "utf-8">
 		<meta name = "viewport" content = "initial-scale=1.0, user-scalable=no" />
-		<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js"></script>
+		<script src="https://maps.googleapis.com/maps/api/js"></script>
 		<link rel = "stylesheet" href = "style.css" type = "text/css"/>
 		<script>
 			var map; 
@@ -19,11 +19,13 @@
 			var myOptions = {
 				zoom: 13,
 				center: myLocation,
+				mapTypeId: google.maps.MapTypeId.ROADMAP
 			};
 			var requestData;
-			var dataPeople;
-			var marker;
-			var markerPeople;
+			var dataPeople, dataLandmarks;
+			var marker, i;
+			var peopleIcon = "people_icon.png";
+			var infoWindow = new google.maps.InfoWindow();
 			function initialize() {
 				map = new google.maps.Map(document.getElementById("map"), myOptions);
 				getMyLocation();
@@ -37,8 +39,7 @@
 						console.log(myLat);
 						console.log(myLong);
 						handleRequest();
-						renderMap();
-						//displayMarker();
+						//renderMap();
 					});
 				} else {
 					alert("geolocation not supported on your browser");
@@ -48,10 +49,38 @@
 				console.log(3);
 				myLocation = new google.maps.LatLng(myLat, myLong);
 				map.panTo(myLocation);
-				marker = new google.maps.Marker({
+				/*marker = new google.maps.Marker({
 					position: myLocation,
-				});
-				marker.setMap(map);
+				});*/
+				//marker.setMap(map);
+				for (i = 0; i < dataPeople.length; i++) {
+					console.log('marker');
+					marker = new google.maps.Marker({
+						position: new google.maps.LatLng(dataPeople[i]["lat"], dataPeople[i]["lng"]),
+						map: map,
+						icon: peopleIcon
+					});
+					//dist = calcDistance();
+					google.maps.event.addListener(marker, 'click', (function(marker, i) {
+						return function() {
+							infoWindow.setContent(dataPeople[i]["login"]);
+							infoWindow.open(map, marker);
+						}
+					})(marker, i));
+				}
+				for (i = 0; i < dataLandmarks.length; i++) {
+					marker = new google.maps.Marker({
+						position: new google.maps.LatLng(dataLandmarks[i]["geometry"]["coordinates"][1], dataLandmarks[i]["geometry"]["coordinates"][0]),
+						map: map,
+					});
+					//dist = calcDistance();
+					google.maps.event.addListener(marker, 'click', (function(marker, i) {
+						return function() {
+							infoWindow.setContent(dataLandmarks[i]["properties"]["Details"]);
+							infoWindow.open(map, marker);
+						}
+					})(marker, i));
+				}
 			}
 			function handleRequest() {
 				request.open("POST", "https://defense-in-derpth.herokuapp.com/sendLocation", true);
@@ -62,18 +91,40 @@
 						console.log(2);
 						console.log(requestData);
 						dataPeople = requestData["people"];
+						dataLandmarks = requestData["landmarks"];
+						renderMap();
 					}
 				};
 				request.send("login=TRACI_SOSA&lat=" + myLat + "&lng=" + myLong);
 			}
+			function calcDistance() {
+				console.log("dist");
+				Number.prototype.toRad = function() {
+					return this * Math.PI/180;
+				}
+				var lat2 = dataPeople[i]["lat"];
+				var lng2 = dataPeople[i]["lng"];
+				var R = 3959; //miles
+				var x1 = lat2 - myLat;
+				var dLat = x1.toRad();
+				var x2 = lng2 - myLong;
+				var dLng = x2.toRad();
+				var a = Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1.toRad())*Math.cos(lat2.toRad())*Math.sin(dLng/2)*Math.sin(dLng/2);
+				var c = 2*Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+				var d = R*c;
+				console.log(d);
+				return d;
+			}
 			/*function displayMarker() {
-				for (int i = 0; i < dataPeople.length; i++) {
+				console.log(4);
+				for (var i = 0; i < dataPeople.length; i++) {
 					location = new google.maps.LatLng(dataPeople[i]["lat"], dataPeople[i]["lng"]);
-					bounds.extend(location);
+					//bounds.extend(location);
 					markerPeople = new google.maps.Marker({
 						position: location,
+						map: map,
 					})
-					markerPeople.setMap(map);
+					//markerPeople.setMap(map);
 				}
 			}*/
 		</script>
