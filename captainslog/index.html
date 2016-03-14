@@ -9,9 +9,9 @@
 	 	$(document).ready(function(){
 	 		$('#msg').keypress(function(event) {
 	 			if (event.which == 13) {
-					var input = $(this).val();
-					console.log(input);
-	 				$('#log').append("<p>"+input+"</p>");
+	 				var timeStamp = new Date();
+					var input = $('#msg').val();
+	 				$('#log').after("<p>"+timeStamp+" - "+input+"</p>");
 	 			}
 	 		})
 
