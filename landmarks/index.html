@@ -12,13 +12,13 @@
 		<link rel = "stylesheet" href = "style.css" type = "text/css"/>
 		<script>
 			var map; 
-			var login = "TRACI_SOSA";
+			var login = "TRACI_SOSA"; //login name
 			var myLat = 0;
 			var myLong = 0;
 			var request = new XMLHttpRequest;
 			var myLocation = new google.maps.LatLng(myLat, myLong);
 			var myOptions = {
-				zoom: 13,
+				zoom: 15,
 				center: myLocation,
 				mapTypeId: google.maps.MapTypeId.ROADMAP
 			};
@@ -65,16 +65,14 @@
 					if (dataPeople[i]["login"] != login) {
 						addMarker(locationPeople, peopleIcon);
 						dist = calcDistance(dataPeople[i]["lat"], dataPeople[i]["lng"]);
-						contentPeople = dataPeople[i]["login"] + "<p> Distance: " + dist + " miles </p>";
+						contentPeople = "<span class = 'login'>"+dataPeople[i]["login"] + "</span><p> Distance: " + dist + " miles </p>";
 						addWindow(contentPeople);
 					} else {
 						addMarker(myLocation, myselfIcon);
-						contentPeople = login + "<p> Nearest Historical Landmark: "+ closestLandmark["properties"]["Location_Name"] + "</br> Distance: " + smallestDist + " miles</p>";
+						contentPeople = "<span class = 'login'>"+ login + "</span><p> Nearest Historical Landmark: "+ closestLandmark["properties"]["Location_Name"] + "</br> Distance: " + smallestDist + " miles</p>";
 						addWindow(contentPeople);
 					}
 				}
-				console.log(myLat);
-				console.log(myLong);
 				map.panTo(myLocation);
 				createPolyline(closestLandmark["geometry"]["coordinates"][1], closestLandmark["geometry"]["coordinates"][0]);
 			}
@@ -90,7 +88,7 @@
 						renderMap();
 					}
 				};
-				request.send("login=TRACI_SOSA&lat=" + myLat + "&lng=" + myLong);
+				request.send("login="+login+"&lat=" + myLat + "&lng=" + myLong);
 			}
 			function calcDistance(latData, lngData) {
 				Number.prototype.toRad = function() {
@@ -137,7 +135,7 @@
 					geodesic: true,
 					strokeColor: "#000000",
 					strokeOpacity: 1.0,
-					strokeWeight: 1
+					strokeWeight: 2
 				});
 				path.setMap(map);
 			}
