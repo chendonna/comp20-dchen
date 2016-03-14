@@ -12,6 +12,7 @@
 		<link rel = "stylesheet" href = "style.css" type = "text/css"/>
 		<script>
 			var map; 
+			var login = "TRACI_SOSA";
 			var myLat = 0;
 			var myLong = 0;
 			var request = new XMLHttpRequest;
@@ -21,11 +22,14 @@
 				center: myLocation,
 				mapTypeId: google.maps.MapTypeId.ROADMAP
 			};
+			var smallestDist = 1; //all landmarks are at max 1 mile from us
+			var closestLandmark;
 			var requestData;
 			var dataPeople, dataLandmarks;
 			var marker, i;
 			var peopleIcon = "people_icon.png";
 			var landmarkIcon = "landmarks.jpg";
+			var myselfIcon = "custom_image.png";
 			var infoWindow = new google.maps.InfoWindow();
 			function initialize() {
 				map = new google.maps.Map(document.getElementById("map"), myOptions);
@@ -48,24 +52,30 @@
 			function renderMap() {
 				console.log(3);
 				myLocation = new google.maps.LatLng(myLat, myLong);
-				//map.panTo(myLocation);
-				/*marker = new google.maps.Marker({
-					position: myLocation,
-				});*/
-				//marker.setMap(map);
-				for (i = 0; i < dataPeople.length; i++) {
-					locationPeople = new google.maps.LatLng(dataPeople[i]["lat"], dataPeople[i]["lng"]);
-					addMarker(locationPeople, peopleIcon);
-					dist = calcDistance(dataPeople[i]["lat"], dataPeople[i]["lng"]);
-					var contentPeople = dataPeople[i]["login"] + "<p> Distance: " + dist + "miles </p>";
-					addWindow(contentPeople);
-				}
 				for (i = 0; i < dataLandmarks.length; i++) {
 					locationLandmarks = new google.maps.LatLng(dataLandmarks[i]["geometry"]["coordinates"][1], dataLandmarks[i]["geometry"]["coordinates"][0]);
 					addMarker(locationLandmarks, landmarkIcon);
 					dist = calcDistance(dataLandmarks[i]["geometry"]["coordinates"][1], dataLandmarks[i]["geometry"]["coordinates"][0]);
-					var contentLandmarks = dataLandmarks[i]["properties"]["Details"]+ "<p> Distance: " + dist + "miles </p>";
+					if (dist < smallestDist) {
+						smallestDist = dist;
+						closestLandmark = dataLandmarks[i];
+					}
+					var contentLandmarks = dataLandmarks[i]["properties"]["Details"]+ "<p> Distance: " + dist + " miles </p>";
 					addWindow(contentLandmarks);
+				}
+				var contentPeople;
+				for (i = 0; i < dataPeople.length; i++) {
+					locationPeople = new google.maps.LatLng(dataPeople[i]["lat"], dataPeople[i]["lng"]);
+					if (dataPeople[i]["login"] != login) {
+						addMarker(locationPeople, peopleIcon);
+						dist = calcDistance(dataPeople[i]["lat"], dataPeople[i]["lng"]);
+						contentPeople = dataPeople[i]["login"] + "<p> Distance: " + dist + "miles </p>";
+						addWindow(contentPeople);
+					} else {
+						addMarker(myLocation, myselfIcon);
+						contentPeople = login + "<p> Nearest Historical Landmark: "+ closestLandmark["properties"]["Location_Name"] + "</br> Distance" + smallestDist + "</p>";
+						addWindow(contentPeople);
+					}
 				}
 				map.panTo(myLocation);
 			}
