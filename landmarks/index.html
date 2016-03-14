@@ -32,9 +32,10 @@
 			var myselfIcon = "custom_image.png";
 			var infoWindow = new google.maps.InfoWindow();
 			function initialize() {
-				map = new google.maps.Map(document.getElementById("map"), myOptions);
+				map = new google.maps.Map(document.getElementById("map"), myOptions); //creates map
 				getMyLocation();
 			}
+			//retrieves my location
 			function getMyLocation() {
 				if (navigator.geolocation){
 					navigator.geolocation.getCurrentPosition(function (position){
@@ -46,13 +47,13 @@
 					alert("geolocation not supported on your browser");
 				}
 			}
+			//retreives data of the people and landmarks in the database 
 			function handleRequest() {
 				request.open("POST", "https://defense-in-derpth.herokuapp.com/sendLocation", true);
 				request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 				request.onreadystatechange = function() {
 					if (request.readyState == 4 && request.status == 200) {
 						requestData = JSON.parse(request.responseText);
-						console.log(requestData);
 						dataPeople = requestData["people"];
 						dataLandmarks = requestData["landmarks"];
 						renderMap();
@@ -62,6 +63,7 @@
 			}
 			function renderMap() {
 				myLocation = new google.maps.LatLng(myLat, myLong);
+				//creates a marker and window for all the landmarks in a 1 mile radius
 				for (i = 0; i < dataLandmarks.length; i++) {
 					locationLandmarks = new google.maps.LatLng(dataLandmarks[i]["geometry"]["coordinates"][1], dataLandmarks[i]["geometry"]["coordinates"][0]);
 					addMarker(locationLandmarks, landmarkIcon);
@@ -74,6 +76,7 @@
 					addWindow(contentLandmarks);
 				}
 				var contentPeople;
+				//creates a marker and window for all the people in the database
 				for (i = 0; i < dataPeople.length; i++) {
 					locationPeople = new google.maps.LatLng(dataPeople[i]["lat"], dataPeople[i]["lng"]);
 					if (dataPeople[i]["login"] != login) {
@@ -81,15 +84,17 @@
 						dist = calcDistance(dataPeople[i]["lat"], dataPeople[i]["lng"]);
 						contentPeople = "<span class = 'login'>"+dataPeople[i]["login"] + "</span><p> <span class = 'dist'>Distance: </span>" + dist + " miles </p>";
 						addWindow(contentPeople);
-					} else {
+					} else { //creates a unique marker and window for myself
 						addMarker(myLocation, myselfIcon);
 						contentPeople = "<span class = 'login'>"+ login + "</span><p> Nearest Historical Landmark: "+ closestLandmark["properties"]["Location_Name"] + "</br> <span class = 'dist'>Distance: </span>" + smallestDist + " miles</p>";
 						addWindow(contentPeople);
 					}
 				}
 				map.panTo(myLocation);
+				//creates polyline from my location and nearest historical landmark
 				createPolyline(closestLandmark["geometry"]["coordinates"][1], closestLandmark["geometry"]["coordinates"][0]);
 			}
+			// used http://stackoverflow.com/questions/14560999/using-the-haversine-formula-in-javascript for the haversine formula
 			function calcDistance(latData, lngData) {
 				Number.prototype.toRad = function() {
 					return this * Math.PI/180;
@@ -108,6 +113,7 @@
 				var d = R * c; 
 				return d.toFixed(2);
 			}
+			//creates a new marker
 			function addMarker(location, image) {
 				marker = new google.maps.Marker({
 					position: location,
@@ -115,6 +121,7 @@
 					icon: image
 				});
 			}
+			//creates a new window
 			function addWindow(content){
 				google.maps.event.addListener(marker, 'click', (function(marker, i) {
 						return function() {
@@ -123,6 +130,7 @@
 						}
 				})(marker, i));
 			}
+			//creates a polyline
 			function createPolyline(endLat, endLng) {
 				startLat = myLat;
 				startLng = myLong;
