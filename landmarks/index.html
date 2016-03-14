@@ -18,7 +18,7 @@
 			var request = new XMLHttpRequest;
 			var myLocation = new google.maps.LatLng(myLat, myLong);
 			var myOptions = {
-				zoom: 15,
+				zoom: 14,
 				center: myLocation,
 				mapTypeId: google.maps.MapTypeId.ROADMAP
 			};
@@ -46,6 +46,20 @@
 					alert("geolocation not supported on your browser");
 				}
 			}
+			function handleRequest() {
+				request.open("POST", "https://defense-in-derpth.herokuapp.com/sendLocation", true);
+				request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+				request.onreadystatechange = function() {
+					if (request.readyState == 4 && request.status == 200) {
+						requestData = JSON.parse(request.responseText);
+						console.log(requestData);
+						dataPeople = requestData["people"];
+						dataLandmarks = requestData["landmarks"];
+						renderMap();
+					}
+				};
+				request.send("login="+login+"&lat=" + myLat + "&lng=" + myLong);
+			}
 			function renderMap() {
 				myLocation = new google.maps.LatLng(myLat, myLong);
 				for (i = 0; i < dataLandmarks.length; i++) {
@@ -65,30 +79,16 @@
 					if (dataPeople[i]["login"] != login) {
 						addMarker(locationPeople, peopleIcon);
 						dist = calcDistance(dataPeople[i]["lat"], dataPeople[i]["lng"]);
-						contentPeople = "<span class = 'login'>"+dataPeople[i]["login"] + "</span><p> Distance: " + dist + " miles </p>";
+						contentPeople = "<span class = 'login'>"+dataPeople[i]["login"] + "</span><p> <span class = 'dist'>Distance: </span>" + dist + " miles </p>";
 						addWindow(contentPeople);
 					} else {
 						addMarker(myLocation, myselfIcon);
-						contentPeople = "<span class = 'login'>"+ login + "</span><p> Nearest Historical Landmark: "+ closestLandmark["properties"]["Location_Name"] + "</br> Distance: " + smallestDist + " miles</p>";
+						contentPeople = "<span class = 'login'>"+ login + "</span><p> Nearest Historical Landmark: "+ closestLandmark["properties"]["Location_Name"] + "</br> <span class = 'dist'>Distance: </span>" + smallestDist + " miles</p>";
 						addWindow(contentPeople);
 					}
 				}
 				map.panTo(myLocation);
 				createPolyline(closestLandmark["geometry"]["coordinates"][1], closestLandmark["geometry"]["coordinates"][0]);
-			}
-			function handleRequest() {
-				request.open("POST", "https://defense-in-derpth.herokuapp.com/sendLocation", true);
-				request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-				request.onreadystatechange = function() {
-					if (request.readyState == 4 && request.status == 200) {
-						requestData = JSON.parse(request.responseText);
-						console.log(requestData);
-						dataPeople = requestData["people"];
-						dataLandmarks = requestData["landmarks"];
-						renderMap();
-					}
-				};
-				request.send("login="+login+"&lat=" + myLat + "&lng=" + myLong);
 			}
 			function calcDistance(latData, lngData) {
 				Number.prototype.toRad = function() {
