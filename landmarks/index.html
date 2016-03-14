@@ -40,9 +40,6 @@
 					navigator.geolocation.getCurrentPosition(function (position){
 						myLat = position.coords.latitude;
 						myLong = position.coords.longitude;
-						console.log(1);
-						console.log(myLat);
-						console.log(myLong);
 						handleRequest();
 					});
 				} else {
@@ -50,7 +47,6 @@
 				}
 			}
 			function renderMap() {
-				console.log(3);
 				myLocation = new google.maps.LatLng(myLat, myLong);
 				for (i = 0; i < dataLandmarks.length; i++) {
 					locationLandmarks = new google.maps.LatLng(dataLandmarks[i]["geometry"]["coordinates"][1], dataLandmarks[i]["geometry"]["coordinates"][0]);
@@ -69,15 +65,18 @@
 					if (dataPeople[i]["login"] != login) {
 						addMarker(locationPeople, peopleIcon);
 						dist = calcDistance(dataPeople[i]["lat"], dataPeople[i]["lng"]);
-						contentPeople = dataPeople[i]["login"] + "<p> Distance: " + dist + "miles </p>";
+						contentPeople = dataPeople[i]["login"] + "<p> Distance: " + dist + " miles </p>";
 						addWindow(contentPeople);
 					} else {
 						addMarker(myLocation, myselfIcon);
-						contentPeople = login + "<p> Nearest Historical Landmark: "+ closestLandmark["properties"]["Location_Name"] + "</br> Distance" + smallestDist + "</p>";
+						contentPeople = login + "<p> Nearest Historical Landmark: "+ closestLandmark["properties"]["Location_Name"] + "</br> Distance: " + smallestDist + " miles</p>";
 						addWindow(contentPeople);
 					}
 				}
+				console.log(myLat);
+				console.log(myLong);
 				map.panTo(myLocation);
+				createPolyline(closestLandmark["geometry"]["coordinates"][1], closestLandmark["geometry"]["coordinates"][0]);
 			}
 			function handleRequest() {
 				request.open("POST", "https://defense-in-derpth.herokuapp.com/sendLocation", true);
@@ -85,7 +84,6 @@
 				request.onreadystatechange = function() {
 					if (request.readyState == 4 && request.status == 200) {
 						requestData = JSON.parse(request.responseText);
-						console.log(2);
 						console.log(requestData);
 						dataPeople = requestData["people"];
 						dataLandmarks = requestData["landmarks"];
@@ -95,7 +93,6 @@
 				request.send("login=TRACI_SOSA&lat=" + myLat + "&lng=" + myLong);
 			}
 			function calcDistance(latData, lngData) {
-				//console.log("dist");
 				Number.prototype.toRad = function() {
 					return this * Math.PI/180;
 				}
@@ -127,6 +124,22 @@
 							infoWindow.open(map, marker);
 						}
 				})(marker, i));
+			}
+			function createPolyline(endLat, endLng) {
+				startLat = myLat;
+				startLng = myLong;
+				var coordinates = [
+					{lat: startLat, lng: startLng},
+					{lat: endLat, lng: endLng},
+				];
+				var path = new google.maps.Polyline({
+					path: coordinates,
+					geodesic: true,
+					strokeColor: "#000000",
+					strokeOpacity: 1.0,
+					strokeWeight: 1
+				});
+				path.setMap(map);
 			}
 		</script>
 	</head>
