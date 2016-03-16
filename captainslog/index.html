@@ -11,11 +11,18 @@
 	 			if (event.which == 13) {
 	 				var timeStamp = new Date();
 					var input = $('#msg').val();
-	 				$('#log').after("<p>"+timeStamp+" - "+input+"</p>");
+					var content = "<p>"+timeStamp+" - "+input+"</p>";
+					localStorage.setItem(timeStamp, content);
+					$('#log').after(content);
 	 			}
-	 		})
-
-	 	})
+	 		});
+	 		reLoad();
+		})
+		function reLoad() {
+			for (key in localStorage) {
+					$('#log').after(localStorage[key]);
+			}
+		}
 	</script>
 </head>
 
