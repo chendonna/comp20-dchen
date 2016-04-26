@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+	<title>Security Assessment</title>
+	<body>
+		<h3>Security Assessment of Enigmatic-Ocean-24555</h3>
+		<hr>
+		<h4>Introduction</h4>
+		<p>This assessment tests the privacy and security of </p>
+		<hr>
+		<h4>Methodology</h4>
+		<p>I first implemented "black box" testing in which I injected javascript to the server using curl. From there, I examined the source code and saw if there was any code that could be exploited.</p>
+		<hr>
+		<h4>Abstract of Findings</h4>
+		<hr>
+		<h4>Issues Found</h4>
+		<ol>
+			<li>
+				<p>Cross-Site Scripting</p>
+				<ul>
+				<li>Affects GET Api</li>
+				<li>Severity of Issue: High <ul>This is an issue that poses a high security risk as the clients believe the site to be trustworthy </ul> </li>
+				<li><p><pre>curl --data "login=<'script>for (var count = 0; count < 10; count++) {alert('hahahahhaha'); }</'script>&lat=-47&lng=-47" http://enigmatic-ocean-24555.herokuapp.com/sendLocation</pre></p></li>
+				<li>This can be easily resolved by parsing through user input to not allow non alphabetical and numerical characters.</li>
+				</ul>
+			</li>
+		</ol>
+		<hr>
+		<h4>Conclusion</h4>
+	</body>
+</html>
