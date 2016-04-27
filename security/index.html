@@ -1,17 +1,22 @@
 <!DOCTYPE html>
 <html>
+	<head>
 	<title>Security Assessment</title>
+	<link rel="stylesheet" href="style.css" type="text/css" />
+	</head>
 	<body>
 		<h3>Security Assessment of Enigmatic-Ocean-24555</h3>
 		<p>By Donna Chen</p>
 		<hr>
 		<h4>Introduction</h4>
-		<p>This assessment tests the vulnerabilities of enigmatic-ocean-24555.herokuapp.com. This site allows for users to input their login and location (in latitude and longitude) and will return JSON of all the people in the database and the landmarks that are all a mile from the user's location that the client could use for their own purposes. Furthermore, when the user goes to the homepage, it returns all the users that are in the database along with the time that they checked in at. The client could also search for a specific user in the database using query strings. </p>
+		<p>This assessment tests the vulnerabilities of enigmatic-ocean-24555.herokuapp.com. This site allows for users to input their login and location (in latitude and longitude) and will return JSON of all the people in the database and the landmarks that are all a mile from the user's location that the client could use for their own purposes. Furthermore, when the user goes to the homepage, it returns all the users that are in the database along with the time that they checked in at. The client could also search for a specific user in the database using query strings.</p>
+		<p>I am here to test for the vulnerabitilies in the web application and determine how it could potentially jeopardize the client and the site itself.</p>
 		<hr>
 		<h4>Methodology</h4>
-		<p>I first implemented "black box" testing in which I injected javascript to the server using curl. From there, I examined the source code and saw if there was any code that could be exploited.</p>
+		<p>I first implemented "black box" testing in which I injected javascript to the server using curl. From there, I examined the source code and saw if there was any code that could be exploited.  </p>
 		<hr>
 		<h4>Abstract of Findings</h4>
+		<p>In order to secure a website, any portion of the site that allows for user input must be sanitized before allowing it to be submitted into a database. Anything that required user input could be exploited to allow for JavaScript or HTML to be injected into the site that the brower will then render. This in turn, could potentially jeopardize the client's privacy and would highly inconvience them.</p>
 		<hr>
 		<h4>Issues Found</h4>
 		<ol>
@@ -19,9 +24,10 @@
 				<p>Cross-Site Scripting</p>
 				<ul>
 				<li>Affects GET Api</li>
-				<li>Severity of Issue: High <ul>This is an issue that poses a high security risk as the clients believe the site to be trustworthy and will be unable to access the page they desired. Inserting this pop up will not allow for any of the page to load and block the client from accessing the data that they want, rendering the page completely inaccessible.</ul> </li>
-				<li><p><pre>curl --data "login=<'script>for (var count = 0; count < 10; count++) {alert('hahahahhaha'); }</'script>&lat=-47&lng=-47" http://enigmatic-ocean-24555.herokuapp.com/sendLocation</pre></p></li>
-				<li>The browser will not be able to distinguish between between what is valid data and so when it sees the script tag, it will automatically run it as javascript. </li>
+				<li>Severity of Issue: High <ul>This is an issue that poses a high security risk as the clients believe the site to be trustworthy and will be unable to access the page they desired. Inserting this pop up will not allow for any of the page to load and block the client from accessing the data that they want, rendering the page completely inaccessible. It also puts the client at risk to malicious content, that could steal the session's cookies or obtain personal information about the client.</ul> </li>
+				<li><p>A simple curl command that sends javascript to the server: <pre>curl --data "login=<'script>for (var count = 0; count < 10; count++) {alert('hahahahhaha'); }</'script>&lat=-47&lng=-47" http://enigmatic-ocean-24555.herokuapp.com/sendLocation</pre></p></li>
+				<li>The browser will not be able to distinguish between between what is valid data and so when it sees the script tag, it will automatically run it as javascript. As the page renders, a large number of pop ups will appear which then causes the page to crash.</li>
+				<li><p><img src= "images/assignment4-morepopups.png" alt = "pic of popups"> <img src = "images/assignment4-popups.png" alt = "pic of site crashing"></p></li>
 				<li>This can be easily resolved by parsing through user input to not allow non-alphabetical and numerical characters.</li>
 				</ul>
 			</li>
@@ -29,15 +35,32 @@
 				<p>HTML Injection</p>
 				<ul>
 				<li>Affects GET API</li>
-				<li>Severity of Issue: High<ul>This is an issue as the hacker exploits the trust between the client and the site, potentially posting malicious concent onto the site. The hacker could embed a link to the site that would redirect the user to malicious content. As the site is perceived to be trustworthy by the client, the user would click on the link and be faced with malicious content that could also put the client's privacy at risk.</ul></li>
+				<li>Severity of Issue: High
+				<ul>This is an issue as the hacker exploits the trust between the client and the site, potentially posting malicious concent onto the site. The hacker could embed a link to the site that would redirect the user to malicious content. As the site is perceived to be trustworthy by the client, the user would click on the link and be faced with malicious content that could also put the client's privacy at risk.</ul>
+				</li>
 				<li>When sending data to the site, users could post anything with HTML tags into the database. As with javascript, the browser recognizes that it is HTML and will therefore render the page as such. For example, simply running (without the quotations in the tags)<pre>curl --data "login=<'a href = 'https://www.reddit.com/r/dankmemes/'>Click here buy expensive things for cheap<'/a><br>&lat=-47&lng=-46" http://enigmatic-ocean-24555.herokuapp.com/sendLocation
 				</pre>would cause a link to appear on the site that would when clicked would redirect the client to reddit. While reddit is not particularly malicious, if the page had, for example, a form in order to buy those expensive things, the user's credit card, and other personal information could then at the hands of the attacker.</li>
-				<li>As well with Cross-Site Scripting, this could also be resolved by parsing through user input and taking out all the non-alphabetial and non-numerical characters from entering the database.</li>
+				<li><p><img src = "images/assignment4-injection.png" alt = "pic of html injection"></p></li>
+				<li>As with Cross-Site Scripting, this could also be resolved by parsing through user input and taking out all the non-alphabetial and non-numerical characters from entering the database.</li>
+				</ul>
+			</li>
+			<li>
+				<p>Inserting Invalid Data to Parameters</p>
+				<ul>
+				<li>Affects POST/GET API</li>
+				<li>Severity of Issue: Low 
+				<ul> This is an issue as it allows userts to input random data into the parameters (only lat and lng), which will then be converted into NaN and that data will be sent back to the client. It takes up space that could be used elsewhere in the datatable. The client also fully expects for the data that is returned to their web application to be fully accurate and not be empty as would be the case here.</ul>
+				</li>
+				<li>A curl command allows for strings to be inserted to lat and lng, which should be numerical values. Therefore parseFloat then converts the values into NaN, which is then sent back to the client. 
+					<pre>curl --data "login=mouse&lng=random&lat=haha" http://enigmatic-ocean-24555.herokuapp.com/sendLocation</pre>
+				</li>
+				<li><p><img src = "images/assignment4-nan.png" alt = "pic of insertion"> </p></li>
+				<li>A simple fix to this issue would be to use the function <pre>isNaN()</pre> instead of using <pre>lat === undefined or lng === undefined</pre> This way, strings would not be inserted into the database.</li>
 				</ul>
 			</li>
 		</ol>
 		<hr>
 		<h4>Conclusion</h4>
-		<p>Vulnerabilties with Enigmatic-Ocean-24555 could damage the trust between the site and the client, rendering the client to be exposed to mulitple malicious content.</p>
+		<p>Vulnerabilities with Enigmatic-Ocean-24555 would damage the trust between the site and the client as the client expects a certain standard from the web application. If they web application did not do what was expected of it or caused the client to be exposed to malicious content, then the site would never be trusted again. Many of the problems above would not take much to fix but I'm sure that there are a multitude of other vulnerabilities that could expose and inconvenience their clients.</p>
 	</body>
 </html>
